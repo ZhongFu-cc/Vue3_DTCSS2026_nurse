@@ -309,6 +309,10 @@ const getDataAndEditorLoaded = async () => {
   emailEditor.value.editor.addEventListener('editor:ready', function () {
 
     emailEditor.value.editor.setMergeTags(mergeTags);
+    emailEditor.value.editor.setBodyValues({
+      contentWidth: "650px"          // 這裡要寫固定寬度，如果是 100% 就會變全寬
+    });
+
     isDisabled.value = false;
   });
 
@@ -322,6 +326,7 @@ const emailEditor = ref()
 
 const emailOptions = {
   locale: 'zh-TW',
+  displayMode: 'email',
 }
 
 
@@ -389,56 +394,56 @@ const loading = () => {
   });
 }
 
-function optimizeForOutlook(html: any): string {
-  let imgIndex = 0;
-  const optimizedHtml = html.replace(
-    /<img([^>]*)>/g,
-    (match: any, attributes: any) => {
-      return `
-        <table width="600" align="${imageInfoList[imgIndex].position}" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td>
-              <img${attributes} style="display: block; height: auto;" width=${imageInfoList[imgIndex++].maxWidthString} height="auto">
-            </td>
-          </tr>
-        </table>
-      `;
-    }
-  );
-  return optimizedHtml;
-}
+// function optimizeForOutlook(html: any): string {
+//   let imgIndex = 0;
+//   const optimizedHtml = html.replace(
+//     /<img([^>]*)>/g,
+//     (match: any, attributes: any) => {
+//       return `
+//         <table width="600" align="${imageInfoList[imgIndex].position}" cellpadding="0" cellspacing="0" border="0">
+//           <tr>
+//             <td>
+//               <img${attributes} style="display: block; height: auto;" width=${imageInfoList[imgIndex++].maxWidthString} height="auto">
+//             </td>
+//           </tr>
+//         </table>
+//       `;
+//     }
+//   );
+//   return optimizedHtml;
+// }
 
-/** 用於儲存各個圖片資訊 */
-const imageInfoList = reactive<Array<{ position: string, maxWidthString: string }>>([]);
+// /** 用於儲存各個圖片資訊 */
+// const imageInfoList = reactive<Array<{ position: string, maxWidthString: string }>>([]);
 
-const getImageSizeFromDesign = (design: any) => {
-  const images: Array<{ src: string; width: number; height: number }> = [];
-  imageInfoList.splice(0, imageInfoList.length);
-  // 遍历 design.body.rows
-  design.body.rows.forEach((row: any) => {
-    // 模板中的每一個 row 板塊
-    row.columns.forEach((column: any) => {
-      // 模板中的每一個 column 板塊
-      column.contents.forEach((content: any) => {
-        // 內容
-        if (content.type === 'image') {
+// const getImageSizeFromDesign = (design: any) => {
+//   const images: Array<{ src: string; width: number; height: number }> = [];
+//   imageInfoList.splice(0, imageInfoList.length);
+//   // 遍历 design.body.rows
+//   design.body.rows.forEach((row: any) => {
+//     // 模板中的每一個 row 板塊
+//     row.columns.forEach((column: any) => {
+//       // 模板中的每一個 column 板塊
+//       column.contents.forEach((content: any) => {
+//         // 內容
+//         if (content.type === 'image') {
 
-          // 計算寬度資訊 
-          let maxWidth = content.values.src.width > 600 ? 600 : content.values.src.width;
-          if (content.values.src.maxWidth) {
-            let widthPercent = Number(content.values.src.maxWidth.replace('%', '')) / 100;
-            maxWidth = Math.round(content.values.src.width * widthPercent) > 600 ? 600 : Math.round(content.values.src.width * widthPercent);
-          }
-          imageInfoList.push({
-            position: content.values.textAlign,
-            maxWidthString: maxWidth.toString()
-          });
-        }
-      });
-    });
-  });
-  return images;
-};
+//           // 計算寬度資訊 
+//           let maxWidth = content.values.src.width > 600 ? 600 : content.values.src.width;
+//           if (content.values.src.maxWidth) {
+//             let widthPercent = Number(content.values.src.maxWidth.replace('%', '')) / 100;
+//             maxWidth = Math.round(content.values.src.width * widthPercent) > 600 ? 600 : Math.round(content.values.src.width * widthPercent);
+//           }
+//           imageInfoList.push({
+//             position: content.values.textAlign,
+//             maxWidthString: maxWidth.toString()
+//           });
+//         }
+//       });
+//     });
+//   });
+//   return images;
+// };
 
 const returnData = reactive<any>({})
 const sendMail = async (sendMailFormRef: FormInstance | undefined) => {
@@ -458,8 +463,6 @@ const sendMail = async (sendMailFormRef: FormInstance | undefined) => {
         },
         {
           minify: true, // 压缩 HTML 大小
-        },
-        {
           inlineStyles: true,
         },
       );
@@ -500,13 +503,10 @@ const sendMail = async (sendMailFormRef: FormInstance | undefined) => {
 
 
   //資料賦值
-  if (jsonDesign) {
-    getImageSizeFromDesign(JSON.parse(jsonDesign))
-  }
   // sendMailFormData.htmlContent = optimizeForOutlook(htmlContent);
   // sendMailFormData.plainText = plainText
   // sendMailFormData.tagList = selectTags.value
-  sendEmailDto.htmlContent = optimizeForOutlook(htmlContent);
+  sendEmailDto.htmlContent = htmlContent;
   sendEmailDto.plainText = plainText
   returnData.tagIdList = selectTags.value.map((item: any) => {
     return item.tagId
@@ -514,12 +514,13 @@ const sendMail = async (sendMailFormRef: FormInstance | undefined) => {
 
   if (!sendMailFormRef) return;
   returnData.sendEmailDTO = sendEmailDto
+  console.log(returnData)
 
   sendMailFormRef.validate(async (valid) => {
     if (valid) {
       try {
         //呼叫父組件給的新增function API
-        await sendEmailByCategoryAndTagApi(returnData, sendUrl.value);
+        await sendEmailByCategoryAndTagApi(returnData);
         await loading()
         ElMessage.success('寄送成功');
         tempSelectedTagList.value = []
