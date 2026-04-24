@@ -4,7 +4,7 @@ import { AxiosPromise } from "axios";
 export function getAttendeeListByTagAndPaginationApi(
   page: number,
   queryText: string
-): AxiosPromise<any> {
+): AxiosPromise {
   return request({
     url: "/attendees/tag/pagination",
     method: "get",
@@ -46,3 +46,13 @@ export function downloadAttendeeExcelApi(): AxiosPromise {
     responseType: "arraybuffer",
   });
 }
+
+export function importExcelApi(formData: FormData): AxiosPromise<any> {
+  return request({
+    url: "/attendees/import-excel-update",
+    method: "post",
+    data: formData,
+  });
+}
+
+
