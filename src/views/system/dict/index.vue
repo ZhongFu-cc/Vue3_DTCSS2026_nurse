@@ -129,7 +129,7 @@ const rules = reactive({
 function handleQuery() {
   loading.value = true;
   getDictTypePage(queryParams)
-    .then(({ data }) => {
+    .then(({ data }: { data: any }) => {
       dictTypeList.value = data.list;
       total.value = data.total;
     })
@@ -161,7 +161,7 @@ function openDialog(dicTypeId?: number) {
   dialog.visible = true;
   if (dicTypeId) {
     dialog.title = "修改字典类型";
-    getDictTypeForm(dicTypeId).then(({ data }) => {
+    getDictTypeForm(dicTypeId).then(({ data }: { data: any }) => {
       Object.assign(formData, data);
     });
   } else {
@@ -239,7 +239,7 @@ const dictDataDialog = reactive({
 const selectedDictType = reactive({ typeCode: "", typeName: "" }); // 当前选中的字典类型
 
 /** 打开字典数据弹窗 */
-function openDictDialog(row: DictTypePageVO) {
+function openDictDialog(row: any) {
   dictDataDialog.visible = true;
   dictDataDialog.title = "【" + row.name + "】字典数据";
 
