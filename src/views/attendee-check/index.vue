@@ -52,7 +52,8 @@
             <el-scrollbar ref="scrollRef" @scroll.native="handleScroll">
               <el-card v-for="item in showAttendeesList" class="checkin-data-card">
                 <div class="member-info" @click="openDrawer(item)">
-                  <p class="attendee-name">{{ item.member.chineseName }}</p>
+                  <p class="attendee-name">{{ item.member.chineseName ? item.member.chineseName : item.member.firstName
+                    + item.member.lastName }}</p>
                   <p>{{ memberEnums[item.member.category] }}</p>
                 </div>
                 <el-icon class="checkin-icon" :class="item.isCheckedIn ? 'checkin' : ''"
@@ -132,7 +133,8 @@
             <el-text>{{ attendee.sequenceNo }}</el-text>
           </el-form-item>
           <el-form-item label="會員姓名">
-            <el-text>{{ attendee.member.chineseName }}</el-text>
+            <el-text>{{ attendee.member.chineseName ? attendee.member.chineseName : attendee.member.firstName +
+              attendee.member.lastName }}</el-text>
           </el-form-item>
           <el-form-item label="會員類別">
             <el-text>{{ memberEnums[attendee.member.category] }}</el-text>
@@ -230,8 +232,8 @@ const checkOut = async () => {
     Object.assign(member, res.data);
     console.log("res", res);
     ElMessage.success({
-      message: `會員${clickRecord.member.chineseName}:簽退成功`,
-      duration: 1000,
+      message: `會員${clickRecord.member.chineseName ? clickRecord.member.chineseName : clickRecord.member.firstName + clickRecord.member.lastName}:簽退成功`,
+      duration: 0,
     });
     isOptionDialogVisible.value = false;
     handleUpdateList();
@@ -270,7 +272,7 @@ const checkin = async () => {
       title: `會員編號:${res.data.attendeesVO.sequenceNo}`,
       dangerouslyUseHTMLString: true,
       message: `<p style="color:green;font-weight:bold;">${type}</p>
-        會員: ${res.data.attendeesVO.member.chineseName}<br/>
+        會員: ${res.data.attendeesVO.member.chineseName ? res.data.attendeesVO.member.chineseName : res.data.attendeesVO.member.firstName + res.data.attendeesVO.member.lastName}<br/>
         會員類別: ${category}<br/>
         <p>收據號碼: ${res.data.attendeesVO.receiptNo}</p>`,
       duration: 0,
