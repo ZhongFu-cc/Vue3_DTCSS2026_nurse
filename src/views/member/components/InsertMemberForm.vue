@@ -16,27 +16,27 @@
         </el-radio-group>
 
       </el-form-item>
-      <el-form-item v-if="data.country === 'Taiwan'" label="中文姓名" prop="chineseName" :rules="chineseNameRules">
-        <el-input v-model="data.chineseName" placeholder="中文名" />
+      <el-form-item label="姓名" prop="chineseName" :rules="chineseNameRules">
+        <el-input v-model="data.chineseName" placeholder="姓名" />
       </el-form-item>
-      <el-form-item label="英文名" prop="firstName" :rules="firstNameRules">
+      <!-- <el-form-item label="英文名" prop="firstName" :rules="firstNameRules">
         <el-input v-model="data.firstName" placeholder="名字" />
-      </el-form-item>
-      <el-form-item label="英文姓氏" prop="lastName" :rules="lastNameRules">
+      </el-form-item> -->
+      <!-- <el-form-item label="英文姓氏" prop="lastName" :rules="lastNameRules">
         <el-input v-model="data.lastName" placeholder="姓氏" />
       </el-form-item>
       <el-form-item v-if="data.country !== 'Taiwan'" label="中文姓名">
         <el-input v-model="data.chineseName" placeholder="中文名" />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="E-mail" prop="email" :rules="emailRules">
         <el-input v-model="data.email" placeholder="E-mail" />
       </el-form-item>
-      <el-form-item label="密碼" prop="password" :rules="passwordRules">
+      <!-- <el-form-item label="密碼" prop="password" :rules="passwordRules">
         <el-input v-model="data.password" placeholder="密碼" type="password" />
       </el-form-item>
       <el-form-item label="確認密碼" prop="confirmPassword">
         <el-input v-model="data.confirmPassword" placeholder="確認密碼" type="password" />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="所屬機構" prop="affiliation" :rules="affiliationRules">
         <el-input v-model="data.affiliation" placeholder="單位" />
       </el-form-item>
