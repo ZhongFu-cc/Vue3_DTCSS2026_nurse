@@ -12,13 +12,13 @@
           </el-radio-group>
         </el-form-item> -->
 
-        <el-form-item label="英文名字" prop="firstName" :rules="[{ required: true, message: '請輸入英文名字', trigger: 'blur' }]">
+        <!-- <el-form-item label="英文名字" prop="firstName" :rules="[{ required: true, message: '請輸入英文名字', trigger: 'blur' }]">
           <el-input v-model="updateFormData.firstName" />
         </el-form-item>
 
         <el-form-item label="英文姓氏" prop="lastName" :rules="[{ required: true, message: '請輸入英文姓氏', trigger: 'blur' }]">
           <el-input v-model="updateFormData.lastName" />
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item label="中文姓名" prop="chineseName">
           <el-input v-model="updateFormData.chineseName" />
