@@ -18,6 +18,7 @@ import EmailQuestionEditor from "@/components/FormField/FormFieldType/EmailQuest
 import SelectQuestionEditor from "@/components/FormField/FormFieldType/SelectQuestionEditor.vue";
 import RateQuestionEditor from "@/components/FormField/FormFieldType/RateQuestionEditor.vue";
 import DateQuestionEditor from "@/components/FormField/FormFieldType/DateQuestionEditor.vue";
+import SectionQuestionEditor from "@/components/FormField/FormFieldType/SectionQuestionEditor.vue";
 
 import { FieldType, type FormField } from "@/api/formField/types";
 
@@ -96,7 +97,7 @@ const componentMap: Record<FieldType, any> = {
   [FieldType.NUMBER]: NumberQuestionEditor,
   [FieldType.EMAIL]: EmailQuestionEditor,
   [FieldType.DATE]: DateQuestionEditor,
-  [FieldType.SECTION]: CheckboxQuestionEditor,
+  [FieldType.SECTION]: SectionQuestionEditor,
   [FieldType.IMAGE]: CheckboxQuestionEditor,
 };
 </script>

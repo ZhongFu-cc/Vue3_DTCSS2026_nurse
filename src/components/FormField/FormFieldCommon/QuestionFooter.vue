@@ -29,7 +29,7 @@
     </div>
 
     <div class="function-box">
-      <div class=" required-item">
+      <div v-if="showRequired" class=" required-item">
         <span>必填：</span>
         <el-switch :model-value="props.isRequired" :active-value="1" :inactive-value="0"
           @update:model-value="handleRequiredChange" />
@@ -73,6 +73,7 @@ const props = defineProps<{
   isRequired: NumericBoolean;
   index: number;
   total: number;
+  showRequired?: boolean;
 }>();
 
 // 誰能出去 子 -> 父
@@ -87,6 +88,7 @@ const emit = defineEmits<{
 // 判斷是否是第一個或最後一個
 const isFirst = computed(() => props.index === 0);
 const isLast = computed(() => props.index === props.total - 1);
+const showRequired = computed(() => props.showRequired ?? true);
 
 
 const handleRequiredChange = (value: any) => {
