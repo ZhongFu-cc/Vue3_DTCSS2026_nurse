@@ -14,7 +14,8 @@
     <div class="form-box">
       <el-form ref="formRef" :model="formModel" :rules="formRules" label-position="top">
         <template v-for="field in validFormFields" :key="field.formFieldId">
-          <el-form-item :label="field.label" :prop="field.formFieldId">
+          <FormSection v-if="isDisplayOnlyField(field)" :field="field" />
+          <el-form-item v-else :label="field.label" :prop="field.formFieldId">
             <component :is="resolveComponent(field)" v-model="formModel[field.formFieldId]" :field="field" />
           </el-form-item>
         </template>
@@ -37,6 +38,7 @@ import SelectQuestion from "@/components/FormResponse/FormSelect.vue";
 import CheckboxQuestion from "@/components/FormResponse/FormCheckbox.vue";
 import RateQuestion from "@/components/FormResponse/FormRate.vue";
 import RadioQuestion from "@/components/FormResponse/FormRadio.vue";
+import FormSection from "@/components/FormResponse/FormSection.vue";
 
 import type { FormInstance, FormRules } from 'element-plus';
 
@@ -82,8 +84,14 @@ const validFormFields = computed<ValidFormField[]>(() => {
 const formModel = reactive<Record<string, any>>({});
 const formRules = reactive<FormRules>({});
 
+const isDisplayOnlyField = (field: FormField) => {
+  return field.fieldType === FieldType.SECTION || field.fieldType === FieldType.IMAGE;
+};
+
 const initForm = () => {
   validFormFields.value.forEach(field => {
+    if (isDisplayOnlyField(field)) return;
+
     const key = field.formFieldId;
     // 取得現有的答案值 (從 field.answer.answerValue 中提取)
     const existingAnswer = (field as any).answer?.answerValue;
@@ -152,6 +160,8 @@ watch(validFormFields, initForm, { immediate: true });
 const buildSubmitPayload = () => {
   const list = validFormFields.value
     .map(field => {
+      if (isDisplayOnlyField(field)) return null;
+
       const val = formModel[field.formFieldId];
 
       // 判斷當前是否有輸入內容
