@@ -29,7 +29,7 @@
         </div>
       </el-tooltip>
       <el-tooltip content="新增標題與說明" placement="right">
-        <div class="floating-item">
+        <div class="floating-item" @click="handleAddSection(focusedIndex)">
           <img :src="textSizeSvg">
         </div>
       </el-tooltip>
@@ -240,6 +240,22 @@ let createDefaultField = () => {
   };
 };
 
+// 預設標題與說明區塊
+let createDefaultSectionField = () => {
+  return <FormField>{
+    fieldType: FieldType.SECTION,
+    label: "標題",
+    description: "說明",
+    placeholder: "",
+    imageUrl: "",
+    imageCaption: "",
+    isRequired: 0,
+    fieldOrder: 0,
+    options: null,
+    validationRules: null,
+  };
+};
+
 let formFieldList = reactive<FormField[]>([]);
 
 const getFormFieldList = async (formId: string) => {
@@ -372,31 +388,35 @@ const handleDeleteField = async (fieldId: string) => {
 
 /**----------------- 新增問題相關 -------------------------------- */
 
-const handleAddField = async (afterIndex: number) => {
-  const newField = createDefaultField();
-
+const getInsertOrder = async (afterIndex: number) => {
   if (formFieldList.length === 0) {
-    newField.fieldOrder = 100;
-  } else if (afterIndex === -1 || afterIndex >= formFieldList.length - 1) {
-    const lastOrder = formFieldList[formFieldList.length - 1]?.fieldOrder ?? 0;
-    newField.fieldOrder = lastOrder + 100;
-  } else {
-    const prevOrder = formFieldList[afterIndex].fieldOrder;
-    const nextOrder = formFieldList[afterIndex + 1].fieldOrder;
-    const gap = nextOrder - prevOrder;
-
-    if (gap > CONFIG.MIN_GAP_FOR_INSERT) {
-      newField.fieldOrder = prevOrder + Math.floor(gap / CONFIG.MIN_GAP_FOR_INSERT);
-    } else {
-      await reorderAllFieldsBeforeInsert(afterIndex + 1);
-      const newPrevOrder = formFieldList[afterIndex].fieldOrder;
-      const newNextOrder = formFieldList[afterIndex + 1].fieldOrder;
-      newField.fieldOrder = newPrevOrder + Math.floor((newNextOrder - newPrevOrder) / CONFIG.MIN_GAP_FOR_INSERT);
-    }
+    return 100;
   }
 
+  if (afterIndex === -1 || afterIndex >= formFieldList.length - 1) {
+    const lastOrder = formFieldList[formFieldList.length - 1]?.fieldOrder ?? 0;
+    return lastOrder + 100;
+  }
+
+  const prevOrder = formFieldList[afterIndex].fieldOrder;
+  const nextOrder = formFieldList[afterIndex + 1].fieldOrder;
+  const gap = nextOrder - prevOrder;
+
+  if (gap > CONFIG.MIN_GAP_FOR_INSERT) {
+    return prevOrder + Math.floor(gap / CONFIG.MIN_GAP_FOR_INSERT);
+  }
+
+  await reorderAllFieldsBeforeInsert(afterIndex + 1);
+  const newPrevOrder = formFieldList[afterIndex].fieldOrder;
+  const newNextOrder = formFieldList[afterIndex + 1].fieldOrder;
+  return newPrevOrder + Math.floor((newNextOrder - newPrevOrder) / CONFIG.MIN_GAP_FOR_INSERT);
+};
+
+const insertNewField = async (afterIndex: number, newField: FormField, successMessage: string) => {
+  newField.fieldOrder = await getInsertOrder(afterIndex);
+
   // 呼叫新增API
-  const res = await addFormFieldApi({
+  await addFormFieldApi({
     ...newField,
     formId: props.formId,
   });
@@ -408,7 +428,17 @@ const handleAddField = async (afterIndex: number) => {
   await nextTick();
   scrollToField(afterIndex + 1);
 
-  ElMessage.success("問題已新增");
+  ElMessage.success(successMessage);
+};
+
+const handleAddField = async (afterIndex: number) => {
+  const newField = createDefaultField();
+  await insertNewField(afterIndex, newField, "問題已新增");
+};
+
+const handleAddSection = async (afterIndex: number) => {
+  const newField = createDefaultSectionField();
+  await insertNewField(afterIndex, newField, "標題與說明已新增");
 };
 
 const reorderAllFieldsBeforeInsert = async (insertPosition: number) => {
